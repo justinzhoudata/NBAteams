@@ -18,9 +18,10 @@ select {
     font-size: 16px;
     color: #495057;
     background-color: #fff;
-    appearance: none; /* Removes the default appearance of select elements in some browsers */
+    appearance: none;
     cursor: pointer;
     margin: 10px 0;
+    display: block;
 }
 
 button {
@@ -32,6 +33,7 @@ button {
     cursor: pointer;
     font-size: 16px;
     margin-top: 10px;
+    display: block;
 }
 
 button:hover {
@@ -56,4 +58,13 @@ li:last-child {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
+}
+
+@media (max-width: 767px) {
+    select, button {
+        height: 50px;
+        font-size: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
