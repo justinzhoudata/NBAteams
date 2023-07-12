@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NBA Player Teams</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    </head>
+
+    <div class="container">
+<body>
+    <h2>Select NBA Teams</h2>
+    <label for="team1">Team 1:</label>
+    <select id="team1" name="team1">
+        <option value="None">None</option>
+    </select>
+    <label for="team2">Team 2:</label>
+    <select id="team2" name="team2">
+        <option value="None">None</option>
+    </select>
+    <label for="team3">Team 3:</label>
+    <select id="team3" name="team3">
+        <option value="None">None</option>
+    </select>
+    <button onclick="findPlayers()">Find Players</button>
+
+    <ul id="playerList"></ul>
+
+    <script>
+        let data;
+        Papa.parse('grouped_teams.csv', {
+            download: true,
+            header: true,
+            dynamicTyping: true,
+            complete: function(results) {
+                data = results.data;
+                populateTeams(results.data.map(player => player.tm));
+            }
+        });
+
+        function populateTeams(teamsArray) {
+    // Remove "None" from the array and sort the remaining teams
+    let uniqueTeams = [...new Set(teamsArray)].sort();
+
+    let team1Select = document.getElementById('team1');
+    let team2Select = document.getElementById('team2');
+    let team3Select = document.getElementById('team3');
+
+    uniqueTeams.forEach(team => {
+        let option1 = document.createElement('option');
+        option1.textContent = team;
+        option1.value = team;
+        team1Select.appendChild(option1);
+
+        let option2 = document.createElement('option');
+        option2.textContent = team;
+        option2.value = team;
+        team2Select.appendChild(option2);
+
+        let option3 = document.createElement('option');
+        option3.textContent = team;
+        option3.value = team;
+        team3Select.appendChild(option3);
+    });
+}
+
+
+        function findPlayers() {
+            let team1 = document.getElementById('team1').value;
+            let team2 = document.getElementById('team2').value;
+            let team3 = document.getElementById('team3').value;
+
+            let selectedTeams = [...new Set([team1, team2, team3].filter(team => team !== "None"))];
+
+            let commonPlayers = data.reduce((common, player) => {
+                if (selectedTeams.includes(player.tm)) {
+                    common[player.player] = (common[player.player] || []).concat(player);
+                }
+                return common;
+            }, {});
+
+            let resultPlayers = Object.keys(commonPlayers).filter(player => 
+                commonPlayers[player].length === selectedTeams.length);
+
+            resultPlayers.sort((a, b) => {
+                let totalWsA = commonPlayers[a].reduce((sum, p) => sum + p.ws, 0);
+                let totalWsB = commonPlayers[b].reduce((sum, p) => sum + p.ws, 0);
+                return totalWsB - totalWsA;
+            });
+
+            let playerList = document.getElementById('playerList');
+            playerList.innerHTML = '';
+
+            resultPlayers.forEach(player => {
+                let listItem = document.createElement('li');
+                listItem.textContent = player;
+                playerList.appendChild(listItem);
+            });
+        }
+    </script>
+    </div>
+</body>
+</html>
